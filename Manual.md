@@ -7,11 +7,11 @@
 + 함수 클래스 전방선언
 + 변수, 함수, 구조체 및 클래스 등의 이름들은 Camel 표기법 사용 
 
-Ex) int myName; , void firstFunc();
+ > int myName; , void firstFunc();
 
 + 상수는 #define 이용하여 가독성 높이기. 단 이름은 대문자로 작성할 것 
 
-#define MAX 10 // ';' 붙이지 않음.
+> #define MAX 10 // ';' 붙이지 않음.
 
 + 사용자 정의 기능은 반드시 주석 달기
 
