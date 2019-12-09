@@ -1,22 +1,23 @@
-ï»¿#include <iostream>
+#include <iostream>
 #include<conio.h>
+#include<vector>
 #include<Windows.h>
 using namespace std;
 #define HPUP 3
-#define SPEED 4
-#define DAMAGE 5
-#define USEDITEM 100
-#define Y 0 // Yê°€ ë“¤ì–´ê°ˆ ì¸ë±ìŠ¤
-#define X 1 // Xê°€ ë“¤ì–´ê°ˆ ì¸ë±ìŠ¤
+#define SPEEDUP 4
+#define DAMAGEUP 5
+#define USEDITEM 12
+#define Y 0 // Y°¡ µé¾î°¥ ÀÎµ¦½º
+#define X 1 // X°¡ µé¾î°¥ ÀÎµ¦½º
 #define CHARACTER 2 // 
-#define LEFT 75 // ì™¼ìª½ ë°©í–¥í‚¤ ì•„ìŠ¤í‚¤ì½”ë“œ
+#define LEFT 75 // ¿ŞÂÊ ¹æÇâÅ° ¾Æ½ºÅ°ÄÚµå
 #define RIGHT 77
 #define UP 72
 #define DOWN 80
-#define WIDTH 20 // ë§µì˜ ê°€ë¡œê¸¸ì´
-#define HEIGHT 20 // ë§µì˜ ì„¸ë¡œê¸¸ì´
-#define WALL 1 // ë²½
-#define NULL 0 // ê³µë°±
+#define WIDTH 20 // ¸ÊÀÇ °¡·Î±æÀÌ
+#define HEIGHT 20 // ¸ÊÀÇ ¼¼·Î±æÀÌ
+#define WALL 1 // º®
+#define NULL 0 // °ø¹é
 //////////////////////////////////////////////////////
 #define col GetStdHandle(STD_OUTPUT_HANDLE) 
 #define BLACK SetConsoleTextAttribute( col,0x0000 );
@@ -25,7 +26,7 @@ using namespace std;
 #define BLUE_GREEN SetConsoleTextAttribute( col,0x0003 );
 #define BLOOD SetConsoleTextAttribute( col,0x0004 );
 #define PUPPLE SetConsoleTextAttribute( col,0x0005 );
-#define GOLD SetConsoleTextAttribute( col,0x0006 );			//ìƒ‰ìƒ ì§€ì •
+#define GOLD SetConsoleTextAttribute( col,0x0006 );			//»ö»ó ÁöÁ¤
 #define WHITE SetConsoleTextAttribute( col,0x0007 );
 #define GRAY SetConsoleTextAttribute( col,0x0008 );
 #define BLUE SetConsoleTextAttribute( col,0x0009 );
@@ -53,8 +54,8 @@ class hpUp
 {
 public:
 	int setHp(player& p, int map[HEIGHT][WIDTH])
-	{ // ë¬¸ì œì  - ë§µì¢Œí‘œë¡œ ê°ˆë•Œë§ˆë‹¤ ì¦ê°€ë¨, ê°’ì´ ì˜¤ë¥¸ ì´í›„ ë‹¤ì‹œ ì´ ìœ„ì¹˜ì— ì™€ë„ ê°’ì´ ì˜¤ë¥´ì§€ ì•Šê²Œ í•˜ë ¤ë©´?
-		if (map[2][2] == CHARACTER) // ìºë¦­í„°ê°€ ì´ ìœ„ì¹˜ë¥¼ ì§€ë‚ ê²½ìš° ì´ ìœ„ì¹˜ëŠ” NULLê°’ì´ ë¨
+	{ // ¹®Á¦Á¡ - ¸ÊÁÂÇ¥·Î °¥¶§¸¶´Ù Áõ°¡µÊ, °ªÀÌ ¿À¸¥ ÀÌÈÄ ´Ù½Ã ÀÌ À§Ä¡¿¡ ¿Íµµ °ªÀÌ ¿À¸£Áö ¾Ê°Ô ÇÏ·Á¸é?
+		if (map[2][2] == CHARACTER) // Ä³¸¯ÅÍ°¡ ÀÌ À§Ä¡¸¦ Áö³¯°æ¿ì ÀÌ À§Ä¡´Â NULL°ªÀÌ µÊ
 		{
 			if (p.hp == 100)
 			{
@@ -69,10 +70,52 @@ public:
 		}
 	}
 };
+class speedUp
+{
+public:
+	int setSp(player& p, int map[HEIGHT][WIDTH])
+	{
+		if (map[10][17] == CHARACTER)
+			{
+				if (p.speed == 3)
+				{
+					p.speed += 5;
+					map[10][17] = USEDITEM;
+					return p.speed;
+				}
+			}
+		else
+		{
+			return p.speed;
+		}
+	}
+};
+class damageUp
+{
+public:
+	int setDg(player& p, int map[HEIGHT][WIDTH])
+	{
+		if (map[15][15] == CHARACTER)
+		{
+			if (p.damage == 10)
+			{
+				p.damage += 2;
+				map[15][15] = USEDITEM;
+				return p.damage;
+			}
+		}
+		else
+		{
+			return p.damage;
+		}
+	}
+};
 
 int character[2];
 int hpup[2];
-int map[HEIGHT][WIDTH] = { NULL }; // ë§µì˜ ê³µë°±
+int speedup[2];
+int damageup[3];
+int map[HEIGHT][WIDTH] = { NULL }; // ¸ÊÀÇ °ø¹é
 void Move();
 void MapDraw();
 void Init();
@@ -80,21 +123,33 @@ void gotoxy(int x, int y);
 
 int main()
 {
-	player ninja;
+	vector<hpUp> item_h;
+	vector<speedUp> item_s;
+	vector<damageUp> item_d;  // vector ÄÁÅ×ÀÌ³Ê ÇÏ³ª¿¡ ´Ù¸¥ÇÔ¼öµéÀ» °¡Áø Å¬·¡½º¸¦ ´Ù ¸ø³ÖÀ½
 	hpUp hp;
-	map[10][10] = CHARACTER;//INITë³´ë‹¤ ë¨¼ì € ì„¤ì •ë˜ì•¼í•¨
+	speedUp sp;
+	damageUp dg;
+
+	item_h.push_back(hp);
+	item_s.push_back(sp);
+	item_d.push_back(dg);//Å¬·¡½º¿¡ ¸Â´Â °´Ã¼¸¦ ³Ö¾îÁà¾ßÇÔ
+//»ı¼ºÀÚ°¡ ÀÖ´Ù¸é item.push_back(hp(10)); ÀÎÀÚ°ª ³Ö¾îÁà¾ßÇÔ
+
+	player ninja;
+
+	map[10][10] = CHARACTER;//INITº¸´Ù ¸ÕÀú ¼³Á¤µÇ¾ßÇÔ
 	map[2][2] = HPUP;
-	map[10][17] = SPEED;
-	map[15][15] = DAMAGE;
+	map[10][17] = SPEEDUP;
+	map[15][15] = DAMAGEUP;
 	Init();
-	for (int i = 0; i < HEIGHT; i++)//ë²½ì…ë ¥
+	for (int i = 0; i < HEIGHT; i++)//º®ÀÔ·Â
 	{
-		for (int j = 0; j < WIDTH ; j++)
+		for (int j = 0; j < WIDTH; j++)
 		{
-			map[0][j] = WALL; // ìœ„ // map[y][x]
-			map[HEIGHT - 1][j] = WALL; // ì•„ë˜
-			map[i][0] = WALL; // ì™¼ìª½
-			map[i][WIDTH - 1] = WALL;// ì˜¤ë¥¸ìª½
+			map[0][j] = WALL; // À§ // map[y][x]
+			map[HEIGHT - 1][j] = WALL; // ¾Æ·¡
+			map[i][0] = WALL; // ¿ŞÂÊ
+			map[i][WIDTH - 1] = WALL;// ¿À¸¥ÂÊ
 		}
 	}
 	while (1)
@@ -108,31 +163,41 @@ int main()
 		ninja.showStatus();
 		if (kbhit())
 		{
-			Move();
+			Move(); // Å°º¸µåÃ¼Å© ¹× °ª¹Ù²Ş?
 		}
 	}
 }
 
-void Init() // ìœ„ì¹˜ì €ì¥
+void Init() // À§Ä¡ÀúÀå
 {
 	int Width = (WIDTH * 2) + 1;
 	int Height = HEIGHT + 10;
 	char buf[256];
-	sprintf(buf, "mode con: lines=%d cols=%d", Height, Width); //ë°°ì—´í¬ê¸°ì— ë”°ë¼ ì¡°ì ˆ
+	sprintf(buf, "mode con: lines=%d cols=%d", Height, Width); //¹è¿­Å©±â¿¡ µû¶ó Á¶Àı
 	system(buf);
 	for (int y = 0; y < HEIGHT; y++)
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
-				if (map[y][x] == CHARACTER)
-				{
-					character[X] = x;
-					character[Y] = y;
-				}
+			if (map[y][x] == CHARACTER)
+			{
+				character[X] = x;
+				character[Y] = y;
+			}
 			if (map[y][x] == HPUP)
 			{
 				hpup[X] = x;
 				hpup[Y] = y;
+			}
+			if (map[y][x] == SPEEDUP)
+			{
+				speedup[X] = x;
+				speedup[Y] = y;
+			}
+			if (map[y][x] == DAMAGEUP)
+			{
+				damageup[X] = x;
+				damageup[Y] = y;
 			}
 		}
 	}
@@ -142,7 +207,7 @@ void Move()
 {
 	int ch;
 	ch = getch();
-	
+
 	{
 		if (ch == 224)
 		{
@@ -180,7 +245,7 @@ void Move()
 	}
 }
 
-void MapDraw() // cout ìš©ë„
+void MapDraw() // cout ¿ëµµ
 {
 	for (int y = 0; y < HEIGHT; y++)
 	{
@@ -189,41 +254,41 @@ void MapDraw() // cout ìš©ë„
 			if (map[y][x] == WALL)
 			{
 				YELLOW
-				cout << "â–©";
+					cout << "¢Ì";
 				WHITE
 			}
 			else if (map[y][x] == HPUP)
 			{
 				GREEN
-				cout << "HP";
+					cout << "HP";
 				WHITE
 			}
-			else if (map[y][x] == SPEED)
+			else if (map[y][x] == SPEEDUP)
 			{
 				BLUE
-				cout << "SP";
+					cout << "SP";
 				WHITE
 			}
-			else if (map[y][x] == DAMAGE)
+			else if (map[y][x] == DAMAGEUP)
 			{
 				GOLD
-				cout << "DG";
+					cout << "DG";
 				WHITE
-			}	
+			}
 			else if (map[y][x] == CHARACTER)
 			{
 				RED
-				cout << "ì˜·";
+					cout << "¿Ê";
 				WHITE
 			}
 			else if (map[y][x] == NULL)
 				cout << "  ";
-		} 
+		}
 		cout << endl;
 	}
 }
 
-void gotoxy(int x, int y) 
+void gotoxy(int x, int y)
 {
 	COORD posXY = { x,y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), posXY);
