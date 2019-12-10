@@ -6,16 +6,21 @@ using namespace std;
 //#define RIGHT 77
 //#define UP 72
 //#define DOWN 80
-
+#define NULL 0
+#define WALL 1
 #define CHARACTER 2
 #define FIRECHARACTER 3
-#define WIDTH 20
-#define HEIGHT 20
-#define WALL 1
-#define NULL 0
 #define FIREITEM 4
 #define MONSTER 5
 #define BOSS 6
+#define OBSTACLE 7
+
+#define WIDTH 20
+#define HEIGHT 20
+
+
+
+
 //////////////////////////////////////////////////////
 #define col GetStdHandle(STD_OUTPUT_HANDLE) 
 #define BLACK SetConsoleTextAttribute( col,0x0000 );
@@ -102,7 +107,7 @@ public:
 		return fireShot;
 	}
 
-	void 
+
 
 
 	/*void move() 캐릭터 이동 코드 direct class에서 구현
@@ -168,7 +173,7 @@ public:
 		SetConsoleCursorInfo(hConsole, &ConsoleCursor);
 	}
 
-	void Wall() //벽생성
+	void Wall() //벽생성 //현상황 의미없음
 	{
 		for (int i = 0; i < HEIGHT; i++)
 		{
@@ -198,11 +203,11 @@ public:
 		{
 			character.fallCharacterY();
 		}
-		if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && map[character.getCharacterY()][character.forLeftCheck()] != WALL)
+		if ((GetAsyncKeyState(VK_LEFT) & 0x8000))
 		{
 			character.characterMoveLeft();
 		}
-		if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && map[character.getCharacterY()][character.forRightCheck()] != WALL)
+		if ((GetAsyncKeyState(VK_RIGHT) & 0x8000))
 		{
 			character.characterMoveRight();
 		}
@@ -218,7 +223,7 @@ public:
 			{
 				system("cls");
 				map[character.getCharacterY()][character.getCharacterX()] = NULL;
-				if (map[character.forUpperCheck()][character.getCharacterX()] != WALL)
+				/*if (map[character.forUpperCheck()][character.getCharacterX()] != WALL)*/ //벽충돌 오류
 					character.jumpCharacterY();
 				if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 					character.characterMoveLeft();
@@ -233,13 +238,14 @@ public:
 			{
 				system("cls");
 				map[character.getCharacterY()][character.getCharacterX()] = NULL;
-				if (map[character.forBottomCheck()][character.getCharacterX()] != WALL)
+				/*if (map[character.forBottomCheck()][character.getCharacterX()] != WALL) //벽충돌오류
 				{
-					character.fallCharacterY();
-				}					
-				if (GetAsyncKeyState(VK_LEFT) & 0x8000 && map[character.getCharacterY()][character.forLeftCheck()] != WALL)
+					
+				}*/
+				character.fallCharacterY();
+				if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 					character.characterMoveLeft();
-				else if (GetAsyncKeyState(VK_RIGHT) & 0x8000 && map[character.getCharacterY()][character.forRightCheck()] != WALL)
+				else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 					character.characterMoveRight();
 				map[character.getCharacterY()][character.getCharacterX()] = CHARACTER;
 				if (i < 2)
@@ -268,10 +274,34 @@ public:
 				{
 						cout << "옷";
 				}
-				else if (map[y][x] == FIREITEM)
+				else if (map[y][x] == FIRECHARACTER)
 				{
 					RED
 						cout << "옷";
+					WHITE
+				}
+				else if (map[y][x] == FIREITEM)
+				{
+					YELLOW
+						cout << "★";
+					WHITE
+				}
+				else if (map[y][x] == MONSTER)
+				{
+					BLOOD
+						cout << "＠";
+					WHITE
+				}
+				else if (map[y][x] == BOSS)
+				{
+					BLOOD
+						cout << "◎";
+					WHITE
+				}
+				else if (map[y][x] == OBSTACLE)
+				{
+					BLOOD
+						cout << "△";
 					WHITE
 				}
 				else if (map[y][x] == NULL)
