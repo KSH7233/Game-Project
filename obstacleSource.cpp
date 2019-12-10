@@ -2,7 +2,7 @@
 
 int map[HEIGHT][WIDTH] = { NULL };
 
-void boom::boomMove()
+void boom::boomMove() // 폭탄의 움직임 랜덤성으로 구현.
 {
 	map[boomXpos][boomYpos] = NULL;
 	int randomCount = rand() % 33;
@@ -19,7 +19,7 @@ void boom::boomMove()
 
 }
 
-void stone::stoneSwitch()
+void stone::stoneSwitch() // 돌장애물의 상하 변경 함수.
 {
 	if (stoneXpos == 18)
 	{
